@@ -1,0 +1,131 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "title": "Prediction Record",
+  "description": "A single prediction record logged per system per event type. Committed records are never edited; corrections are new records.",
+  "type": "object",
+  "required": [
+    "prediction_id",
+    "subject_id",
+    "made_on",
+    "system",
+    "event_type",
+    "rule_ids",
+    "verdict",
+    "window",
+    "window_length_days",
+    "probability",
+    "base_rate",
+    "miss_condition"
+  ],
+  "properties": {
+    "prediction_id": {
+      "type": "string",
+      "pattern": "^PR-\\d{4}$",
+      "description": "Unique prediction identifier, e.g. PR-0001"
+    },
+    "subject_id": {
+      "type": "string",
+      "description": "Anonymized subject identifier, e.g. P001"
+    },
+    "made_on": {
+      "type": "string",
+      "format": "date",
+      "description": "Date the prediction was made (YYYY-MM-DD)"
+    },
+    "system": {
+      "type": "string",
+      "enum": ["KP", "BPHS", "PHALADEEPIKA", "COMBINED"],
+      "description": "Rule system used for this prediction"
+    },
+    "text_and_edition": {
+      "type": "string",
+      "description": "Source text and edition, e.g. 'KP Reader, 2nd edition'"
+    },
+    "combined_from": {
+      "type": "array",
+      "items": {
+        "type": "string",
+        "pattern": "^PR-\\d{4}$"
+      },
+      "description": "Prediction IDs this record combines from, only when system is COMBINED"
+    },
+    "event_type": {
+      "type": "string",
+      "enum": ["marriage", "job_career", "higher_education", "foreign_travel_settlement", "children"],
+      "description": "Type of event being predicted"
+    },
+    "rule_ids": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      },
+      "description": "Rule IDs cited from rule tables, e.g. ['KP-R04-cusp7-sublord']"
+    },
+    "source": {
+      "type": "string",
+      "description": "Source page or location in the text"
+    },
+    "evidence_tier": {
+      "type": "string",
+      "enum": ["A", "B", "C"],
+      "description": "Evidence tier. Default is C."
+    },
+    "verdict": {
+      "type": "string",
+      "enum": ["promised", "denied", "uncertain"],
+      "description": "Whether the event is promised, denied, or uncertain"
+    },
+    "window": {
+      "type": "object",
+      "required": ["start", "end"],
+      "properties": {
+        "start": {
+          "type": "string",
+          "format": "date",
+          "description": "Window start date (YYYY-MM-DD)"
+        },
+        "end": {
+          "type": "string",
+          "format": "date",
+          "description": "Window end date (YYYY-MM-DD)"
+        }
+      }
+    },
+    "window_length_days": {
+      "type": "integer",
+      "minimum": 1,
+      "description": "Length of the window in days"
+    },
+    "dasha_basis": {
+      "type": "string",
+      "description": "Vimshottari dasha basis, e.g. 'Venus-Rahu'"
+    },
+    "probability": {
+      "type": "number",
+      "minimum": 0,
+      "maximum": 1,
+      "description": "Assigned probability of the event within the window"
+    },
+    "base_rate": {
+      "type": "number",
+      "minimum": 0,
+      "maximum": 1,
+      "description": "Base rate for this event type in the population"
+    },
+    "miss_condition": {
+      "type": "string",
+      "description": "Condition under which the prediction is scored as a miss"
+    },
+    "outcome": {
+      "type": ["string", "null"],
+      "enum": ["hit", "miss", null],
+      "description": "Scored outcome after the window closes. Null until scored."
+    },
+    "scored_on": {
+      "type": ["string", "null"],
+      "format": "date",
+      "description": "Date the prediction was scored. Null until scored."
+    }
+  },
+  "additionalProperties": false
+}

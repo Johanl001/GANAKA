@@ -1,0 +1,106 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "title": "Palm Data Schema",
+  "description": "Structured palm data captured from hand images. LLM may only interpret fields present in this file.",
+  "type": "object",
+  "required": ["schema_version", "subject_id", "capture", "geometry", "lines", "mounts", "consent"],
+  "properties": {
+    "schema_version": {
+      "type": "string",
+      "const": "1.0"
+    },
+    "subject_id": {
+      "type": "string"
+    },
+    "capture": {
+      "type": "object",
+      "required": ["hand", "blur_score", "scale_reference", "tilt_deg", "usable"],
+      "properties": {
+        "hand": { "type": "string", "enum": ["left", "right"] },
+        "blur_score": { "type": "number", "minimum": 0, "maximum": 1 },
+        "scale_reference": { "type": "boolean" },
+        "tilt_deg": { "type": "number" },
+        "usable": { "type": "boolean" }
+      }
+    },
+    "geometry": {
+      "type": "object",
+      "required": ["palm_width_to_length", "finger_length_ratios", "thumb_angle_deg"],
+      "properties": {
+        "palm_width_to_length": { "type": "number" },
+        "finger_length_ratios": {
+          "type": "object",
+          "properties": {
+            "index_to_ring": { "type": "number" },
+            "middle_to_palm": { "type": "number" }
+          }
+        },
+        "thumb_angle_deg": { "type": "number" }
+      }
+    },
+    "lines": {
+      "type": "object",
+      "required": ["life", "head", "heart", "fate"],
+      "properties": {
+        "life": { "$ref": "#/definitions/palmLine" },
+        "head": { "$ref": "#/definitions/palmLine" },
+        "heart": {
+          "type": "object",
+          "allOf": [
+            { "$ref": "#/definitions/palmLine" },
+            { "required": ["ends_between"] },
+            { "properties": { "ends_between": { "type": "string" } } }
+          ]
+        },
+        "fate": {
+          "type": "object",
+          "properties": {
+            "present": { "type": "boolean" },
+            "line": { "$ref": "#/definitions/palmLine" }
+          }
+        }
+      }
+    },
+    "mounts": {
+      "type": "object",
+      "properties": {
+        "venus": { "$ref": "#/definitions/mount" },
+        "jupiter": { "$ref": "#/definitions/mount" },
+        "saturn": { "$ref": "#/definitions/mount" },
+        "apollo": { "$ref": "#/definitions/mount" },
+        "mercury": { "$ref": "#/definitions/mount" },
+        "moon": { "$ref": "#/definitions/mount" }
+      }
+    },
+    "consent": {
+      "type": "object",
+      "required": ["given", "image_deleted"],
+      "properties": {
+        "given": { "type": "boolean" },
+        "image_deleted": { "type": "boolean" }
+      }
+    }
+  },
+  "definitions": {
+    "palmLine": {
+      "type": "object",
+      "properties": {
+        "length_norm": { "type": "number" },
+        "curvature": { "type": "string" },
+        "breaks": { "type": "number" },
+        "forks": { "type": "number" },
+        "islands": { "type": "number" },
+        "start": { "type": "string" },
+        "end": { "type": "string" },
+        "confidence": { "type": "number", "minimum": 0, "maximum": 1 }
+      }
+    },
+    "mount": {
+      "type": "object",
+      "properties": {
+        "prominence": { "type": "string", "enum": ["low", "medium", "high"] },
+        "confidence": { "type": "number", "minimum": 0, "maximum": 1 }
+      }
+    }
+  }
+}
